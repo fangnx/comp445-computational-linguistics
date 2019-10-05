@@ -58,7 +58,13 @@
 
 ;; Problem 14
 (defn concat-three [x, y, z]
-  (concat 
+  (if (empty? x)
+    (if (empty? y)
+      (if (empty? z)
+        '()
+        (cons (first z) (concat-three x y (rest z))))
+      (cons (first y) (concat-three x (rest y) z)))
+    (cons (first x) (concat-three (rest x) y z))))
 
 ;; Problem 15
 (defn sequence-to-power [x, n]
@@ -73,11 +79,4 @@
     (if (= (first x) 'a)
       (in-L? (rest x))
       false)))
-
-
-
-
-
-
-
 
