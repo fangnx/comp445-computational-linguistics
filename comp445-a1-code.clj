@@ -14,7 +14,7 @@
 (def exp-13-1 (+ 0 13))
 (def exp-13-2 (* 1 13))
 (def exp-13-3 (- 20 7))
-(def exp-13-4 (+ 6.5 6.5))
+(def exp-13-4 (+ 6 7))
 
 ;; Problem 4
 (defn third [l] (first (rest (rest l))))
@@ -32,7 +32,9 @@
 
 ;; Problem 8
 (defn add-to-end [l, x] 
- (concat l [x]))
+  (if (empty? l) 
+    [x]
+    (cons (first l) (add-to-end (rest l) x))))
 
 ;; Problem 9
 (defn reverse [l]
@@ -41,8 +43,9 @@
 
 ;; Problem 10
 (defn count-to-1 [n]
- (if (= n 0) '()
-  (concat [n] (count-to-1 (- n 1)))))  
+  (if (= n 0) 
+    '()
+    (cons n (count-to-1 (- n 1)))))  
 
 ;; Problem 11
 (defn count-to-n [n]
@@ -67,10 +70,17 @@
     (cons (first x) (concat-three (rest x) y z))))
 
 ;; Problem 15
+(defn concat-two [x, y]
+  (if (empty? x)
+    (if (empty? y)
+      '()
+      (cons (first y) (concat-two x (rest y))))
+    (cons (first x) (concat-two (rest x) y))))
+
 (defn sequence-to-power [x, n]
-  (if (= n 0) 
+  (if (= n 0)
     '()
-    (concat x (sequence-to-power x (- n 1)))))
+    (concat-two x (sequence-to-power x (- n 1)))))
 
 ;; Problem 16
 (defn in-L? [x]
