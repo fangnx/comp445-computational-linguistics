@@ -37,7 +37,7 @@
 
 (def moby-vocab (get-vocabulary moby-word-tokens []))
 
-;; (println moby-vocab)
+; (println moby-vocab)
 
 ;; Problem 2
 (defn get-count-of-word [w word-tokens count]
@@ -55,7 +55,7 @@
 ;; Problem 3
 (def moby-word-frequencies (get-word-counts moby-vocab moby-word-tokens))
 
-;; (println moby-word-frequencies)
+; (println moby-word-frequencies)
 
 ;; Problem 4
 (defn flip [p]
@@ -83,7 +83,7 @@
     (cons (sample-categorical vocab (create-uniform-distribution vocab))
           (sample-uniform-BOW-sentence (- n 1) vocab))))
 
-;; (println (sample-uniform-BOW-sentence 4 (list 'the 'a 'every)))
+; (println (sample-uniform-BOW-sentence 4 (list 'the 'a 'every)))
 
 ;; Problem 5
 (defn score-categorical [outcome outcomes params]
@@ -105,7 +105,7 @@
       1
       sentence))
 
-;; (println (compute-uniform-BOW-prob (list 'the 'a 'every) (list 'every 'every)))
+; (println (compute-uniform-BOW-prob (list 'the 'a 'every) (list 'every 'every)))
 
 ;; Problem 6
 (def sen1 (sample-uniform-BOW-sentence 3 moby-vocab))
@@ -145,9 +145,37 @@
 (println sen15)
 (println sen16)
 
+;; Problem 9
+(defn index-in-list [w lst index]
+  (if (empty? lst)
+    -1
+    (if (= w (first lst))
+      index
+      (index-in-list w (rest lst) (+ index 1)))))
 
+(defn lookup-probability [w outcomes probs]
+  (let [index (index-in-list w outcomes 0)]
+    (if (= index -1)
+      (throw "Error: no matching outcome.")
+      (nth probs index))))
 
+; (println (lookup-probability 'a (list 'the 'a 'every) (list 0.2 0.5 0.3)))
 
+;; Problem 10
+(defn product [l]
+  (apply * l))
+
+(defn compute-BOW-prob [sentence vocab probabilities]
+  (product 
+    (map (fn [w] (lookup-probability w vocab probabilities)) sentence)))
+
+;; Problem 11
+(println (compute-BOW-prob sen11 moby-vocab moby-word-probabilities))
+(println (compute-BOW-prob sen12 moby-vocab moby-word-probabilities))
+(println (compute-BOW-prob sen13 moby-vocab moby-word-probabilities))
+(println (compute-BOW-prob sen14 moby-vocab moby-word-probabilities))
+(println (compute-BOW-prob sen15 moby-vocab moby-word-probabilities))
+(println (compute-BOW-prob sen16 moby-vocab moby-word-probabilities))
 
 
 
