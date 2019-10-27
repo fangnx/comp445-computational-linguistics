@@ -37,7 +37,7 @@
 
 (def moby-vocab (get-vocabulary moby-word-tokens []))
 
-(println moby-vocab)
+;; (println moby-vocab)
 
 ;; Problem 2
 (defn get-count-of-word [w word-tokens count]
@@ -55,7 +55,7 @@
 ;; Problem 3
 (def moby-word-frequencies (get-word-counts moby-vocab moby-word-tokens))
 
-(println moby-word-frequencies)
+;; (println moby-word-frequencies)
 
 ;; Problem 4
 (defn flip [p]
@@ -83,7 +83,7 @@
     (cons (sample-categorical vocab (create-uniform-distribution vocab))
           (sample-uniform-BOW-sentence (- n 1) vocab))))
 
-(println (sample-uniform-BOW-sentence 4 (list 'the 'a 'every)))
+;; (println (sample-uniform-BOW-sentence 4 (list 'the 'a 'every)))
 
 ;; Problem 5
 (defn score-categorical [outcome outcomes params]
@@ -101,12 +101,49 @@
 (defn compute-uniform-BOW-prob [vocab sentence] 
   (foldr
     (fn [word score] 
-      (* (score-categorical word vocab (create-uniform-distribution vocab)) score)
+      (* (score-categorical word vocab (create-uniform-distribution vocab)) score))
       1
-      sentence)))
+      sentence))
 
-(println (compute-uniform-BOW-prob (list 'the 'a 'every) (list 'every 'every)))
+;; (println (compute-uniform-BOW-prob (list 'the 'a 'every) (list 'every 'every)))
 
+;; Problem 6
+(def sen1 (sample-uniform-BOW-sentence 3 moby-vocab))
+(def sen2 (sample-uniform-BOW-sentence 3 moby-vocab))
+(def sen3 (sample-uniform-BOW-sentence 3 moby-vocab))
+(def prob-sen1 (compute-uniform-BOW-prob moby-vocab sen1))
+(def prob-sen2 (compute-uniform-BOW-prob moby-vocab sen2))
+(def prob-sen3 (compute-uniform-BOW-prob moby-vocab sen3))
+
+(print sen1) (println prob-sen1)
+(print sen2) (println prob-sen2)
+(print sen3) (println prob-sen3)
+
+;; Problem 7
+(def moby-word-probabilities (normalize moby-word-frequencies))
+
+(println moby-word-probabilities)
+
+;; Problem 8
+(defn sample-BOW-sentence [len vocabulary probabilities]
+  (if (= len 0)
+    '()
+    (cons (sample-categorical vocabulary probabilities)
+      (sample-BOW-sentence (- len 1) vocabulary probabilities))))
+
+(def sen11 (sample-BOW-sentence 3 moby-vocab moby-word-probabilities))
+(def sen12 (sample-BOW-sentence 3 moby-vocab moby-word-probabilities))
+(def sen13 (sample-BOW-sentence 3 moby-vocab moby-word-probabilities))
+(def sen14 (sample-BOW-sentence 3 moby-vocab moby-word-probabilities))
+(def sen15 (sample-BOW-sentence 3 moby-vocab moby-word-probabilities))
+(def sen16 (sample-BOW-sentence 3 moby-vocab moby-word-probabilities))
+
+(println sen11)
+(println sen12)
+(println sen13)
+(println sen14)
+(println sen15)
+(println sen16)
 
 
 
