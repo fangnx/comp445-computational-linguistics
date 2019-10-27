@@ -1,5 +1,5 @@
-;; Comp/Ling 445 Assignment 1
-;; Author: fangnx
+;; COMP/LING 445 Assignment 1
+;; Author: Naxin Fang
 
 ;; Problem 1
 (defn abs [x] (Math/sqrt(* x x)))
