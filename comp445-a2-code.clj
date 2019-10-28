@@ -100,8 +100,8 @@
 
 (defn compute-uniform-BOW-prob [vocab sentence] 
   (foldr
-    (fn [word score] 
-      (* (score-categorical word vocab (create-uniform-distribution vocab)) score))
+    (fn [word rest-prob] 
+      (* (score-categorical word vocab (create-uniform-distribution vocab)) rest-prob))
       1
       sentence))
 
@@ -122,7 +122,7 @@
 ;; Problem 7
 (def moby-word-probabilities (normalize moby-word-frequencies))
 
-(println moby-word-probabilities)
+; (println moby-word-probabilities)
 
 ;; Problem 8
 (defn sample-BOW-sentence [len vocabulary probabilities]
@@ -176,11 +176,3 @@
 (println (compute-BOW-prob sen14 moby-vocab moby-word-probabilities))
 (println (compute-BOW-prob sen15 moby-vocab moby-word-probabilities))
 (println (compute-BOW-prob sen16 moby-vocab moby-word-probabilities))
-
-
-
-
-
-
-
-
