@@ -156,7 +156,7 @@
 (defn lookup-probability [w outcomes probs]
   (let [index (index-in-list w outcomes 0)]
     (if (= index -1)
-      (throw "Error: no matching outcome.")
+      0
       (nth probs index))))
 
 ; (println (lookup-probability 'a (list 'the 'a 'every) (list 0.2 0.5 0.3)))
