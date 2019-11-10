@@ -149,7 +149,7 @@
   (first (rest theta-corpus)))
 
 (defn sample-thetas-corpora [sample-size sent-len corpus-len theta-probs]
-  (repeat (fn [] (sample-theta-corpus sent-len corpus-len theta-probs)) sample-size))
+  (repeatedly sample-size (fn [] (sample-theta-corpus sent-len corpus-len theta-probs))))
 
 (defn one-func [target corpus]
   (if (= target corpus) 1 0))
@@ -165,9 +165,9 @@
 (println (estimate-corpus-marginal my-corpus 50 2 2 theta-prior))
 (println (estimate-corpus-marginal my-corpus 50 2 2 theta-prior))
 (println (estimate-corpus-marginal my-corpus 50 2 2 theta-prior))
-(println (estimate-corpus-marginal my-corpus 1000 2 2 theta-prior))
-(println (estimate-corpus-marginal my-corpus 1000 2 2 theta-prior))
-(println (estimate-corpus-marginal my-corpus 1000 2 2 theta-prior))
+(println (estimate-corpus-marginal my-corpus 10000 2 2 theta-prior))
+(println (estimate-corpus-marginal my-corpus 10000 2 2 theta-prior))
+(println (estimate-corpus-marginal my-corpus 10000 2 2 theta-prior))
 
 ;; Problem 11
 (defn get-count [obs observation-list count]
@@ -181,12 +181,25 @@
   (let [count-obs (fn [obs] (get-count obs observation-list 0))]
     (map count-obs outcomes)))
 
-(def rejection-sample [theta observed-corpus sample-size sent-len corpus-len theta-probs]
+(defn reduce-sum-pairs [a b]
+  (list (+ (first a) (first b)) (+ (first (rest a)) (first (rest b)))))
+
+(defn rejection-sampler [theta observed-corpus sample-size sent-len corpus-len theta-probs]
   (let [tc-pairs (sample-thetas-corpora sample-size sent-len corpus-len theta-probs)]
-    (filter (fn [c] (not= c observed-corpus)) tc-pairs)))
+    (reduce (fn [a b] (if (= b 0) 0 (/ a b)))
+            (reduce
+             (fn [pa pb] (reduce-sum-pairs pa pb))
+             '(0 0)
+             (map (fn [tc] (get-counts (list theta observed-corpus) tc))
+                  (filter (fn [tc] (= (get-corpus tc) observed-corpus))
+                          tc-pairs))))))
 
 ;; Problem 12
 (println 'Problem 11/12)
 (println (rejection-sampler theta1 my-corpus 100 2 2 theta-prior))
 (println (rejection-sampler theta1 my-corpus 100 2 2 theta-prior))
 (println (rejection-sampler theta1 my-corpus 100 2 2 theta-prior))
+(println (rejection-sampler theta1 my-corpus 10000 2 2 theta-prior))
+(println (rejection-sampler theta1 my-corpus 10000 2 2 theta-prior))
+(println (rejection-sampler theta1 my-corpus 10000 2 2 theta-prior))
+
