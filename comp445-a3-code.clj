@@ -46,9 +46,9 @@
                (map (fn [z] (Math/pow 2 z))
                     (map (fn [x] (- x mx)) log-vals)))))))
 
-;; Problem 1
 (def my-corpus '((call me) (call ishmael)))
 
+;; Problem 1
 (defn index-in-list [w lst index]
   (if (empty? lst)
     -1
@@ -100,6 +100,7 @@
 (println 'Problem 6)
 (println (compute-posterior-predictive my-corpus my-corpus theta-prior))
 
+;; Problem 7
 (defn normalize [params]
   (let [sum (apply + params)]
     (map (fn [x] (/ x sum)) params)))
@@ -126,11 +127,7 @@
     (cons (sample-categorical vocabulary probabilities)
           (sample-BOW-sentence (- len 1) probabilities))))
 
-; (println (sample-BOW-sentence 10 theta1))
-
-;; Problem 7
 (defn sample-BOW-corpus [theta sent-len corpus-len]
-  ; (repeat (sample-BOW-sentence sent-len theta) corpus-len))
   (repeat (fn [] (sample-BOW-sentence sent-len theta)) corpus-len))
 
 (println 'Problem 7)
@@ -138,12 +135,13 @@
 
 ;; Problem 8
 (defn sample-theta-corpus [sent-len corpus-len theta-probs]
-  (let [theta theta-probs]
+  (let [theta (sample-categorical thetas theta-probs)]
     (list theta (sample-BOW-corpus theta sent-len corpus-len))))
 
 (println 'Problem 8)
-(println (sample-theta-corpus 4 4 theta1))
+(println (sample-theta-corpus 2 2 theta-prior))
 
+;; Problem 9
 (defn get-theta [theta-corpus]
   (first theta-corpus))
 
@@ -153,12 +151,42 @@
 (defn sample-thetas-corpora [sample-size sent-len corpus-len theta-probs]
   (repeat (fn [] (sample-theta-corpus sent-len corpus-len theta-probs)) sample-size))
 
-;; Problem 9
+(defn one-func [target corpus]
+  (if (= target corpus) 1 0))
 
-
+(defn estimate-corpus-marginal [corpus sample-size sent-len corpus-len theta-probs]
+  (let [target corpus, thetas-corpora (sample-thetas-corpora sample-size sent-len corpus-len theta-probs)]
+    (/
+     (reduce + (map (fn [tc] (one-func target (get-corpus tc))) thetas-corpora))
+     sample-size)))
 
 ;; Problem 10
+(println 'Problem 9/10)
+(println (estimate-corpus-marginal my-corpus 50 2 2 theta-prior))
+(println (estimate-corpus-marginal my-corpus 50 2 2 theta-prior))
+(println (estimate-corpus-marginal my-corpus 50 2 2 theta-prior))
+(println (estimate-corpus-marginal my-corpus 1000 2 2 theta-prior))
+(println (estimate-corpus-marginal my-corpus 1000 2 2 theta-prior))
+(println (estimate-corpus-marginal my-corpus 1000 2 2 theta-prior))
 
 ;; Problem 11
+(defn get-count [obs observation-list count]
+  (if (empty? observation-list)
+    count
+    (if (= obs (first observation-list))
+      (get-count obs (rest observation-list) (+ 1 count))
+      (get-count obs (rest observation-list) count))))
+
+(defn get-counts [outcomes observation-list]
+  (let [count-obs (fn [obs] (get-count obs observation-list 0))]
+    (map count-obs outcomes)))
+
+(def rejection-sample [theta observed-corpus sample-size sent-len corpus-len theta-probs]
+  (let [tc-pairs (sample-thetas-corpora sample-size sent-len corpus-len theta-probs)]
+    (filter (fn [c] (not= c observed-corpus)) tc-pairs)))
 
 ;; Problem 12
+(println 'Problem 11/12)
+(println (rejection-sampler theta1 my-corpus 100 2 2 theta-prior))
+(println (rejection-sampler theta1 my-corpus 100 2 2 theta-prior))
+(println (rejection-sampler theta1 my-corpus 100 2 2 theta-prior))
