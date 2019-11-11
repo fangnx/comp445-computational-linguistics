@@ -60,12 +60,9 @@
   (+ (score-corpus corpus theta)
      (log2 (nth theta-probs (index-in-list theta thetas 0)))))
 
-; (println (score-BOW-sentence (first my-corpus) theta1))
-; (println (score-corpus my-corpus theta1))
-
-(println 'Problem 1)
-(println (theta-corpus-joint theta1 my-corpus theta-prior))
-(println (theta-corpus-joint theta2 my-corpus theta-prior))
+; (println 'Problem 1)
+; (println (theta-corpus-joint theta1 my-corpus theta-prior))
+; (println (theta-corpus-joint theta2 my-corpus theta-prior))
 
 ;; Problem 2
 (defn compute-marginal [corpus theta-probs]
@@ -78,8 +75,8 @@
 (defn compute-conditional-prob [theta corpus theta-probs]
   (- (theta-corpus-joint theta corpus theta-probs) (compute-marginal corpus theta-probs)))
 
-(println 'Problem 3)
-(println (compute-conditional-prob theta1 my-corpus theta-prior))
+; (println 'Problem 3)
+; (println (compute-conditional-prob theta1 my-corpus theta-prior))
 
 ;; Problem 4
 (defn compute-conditional-dist [corpus theta-probs]
@@ -130,16 +127,16 @@
 (defn sample-BOW-corpus [theta sent-len corpus-len]
   (repeat (fn [] (sample-BOW-sentence sent-len theta)) corpus-len))
 
-(println 'Problem 7)
-(println (sample-BOW-corpus theta1 2 2))
+; (println 'Problem 7)
+; (println (sample-BOW-corpus theta1 2 2))
 
 ;; Problem 8
 (defn sample-theta-corpus [sent-len corpus-len theta-probs]
   (let [theta (sample-categorical thetas theta-probs)]
     (list theta (sample-BOW-corpus theta sent-len corpus-len))))
 
-(println 'Problem 8)
-(println (sample-theta-corpus 2 2 theta-prior))
+; (println 'Problem 8)
+; (println (sample-theta-corpus 2 2 theta-prior))
 
 ;; Problem 9
 (defn get-theta [theta-corpus]
