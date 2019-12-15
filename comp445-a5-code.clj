@@ -35,6 +35,11 @@
                (map (fn [z] (Math/pow 2 z))
                     (map (fn [x] (- x mx)) log-vals)))))))
 
+(defn logsumexp-clean [& log-vals]
+  (log2 (apply + 
+    (map (fn [z]
+    (Math/pow 2 z)) log-vals))))
+
 (defn logscore-categorical [outcome outcomes params]
   (if (= outcome (first outcomes))
     (log2 (first params))
@@ -49,23 +54,21 @@
 
 ;; Problem 1
 (defn score-next-state-word [curr-state next-state next-obs transtion-dists obs-dists]
-  (logsumexp
-   [(nth (dist-lookup next-state hidden-states theta-observation-dists-1) 
-    (index-in-list next-obs vocabulary 0))
-   (nth (dist-lookup curr-state hidden-states theta-transition-dists-1) 
-    (index-in-list next-state hidden-states 0))]))
+  (+
+   (log2 (nth (dist-lookup next-state hidden-states theta-observation-dists-1) 
+    (index-in-list next-obs vocabulary 0)))
+   (log2 (nth (dist-lookup curr-state hidden-states theta-transition-dists-1) 
+    (index-in-list next-state hidden-states 0)))))
 
 (println 'Problem 1)
 (println (score-next-state-word 'Start 'N 'me theta-transition-dists-1 theta-observation-dists-1))
-; (println (dist-lookup 'N hidden-states theta-observation-dists-1))
-; (println (dist-lookup 'Start hidden-states theta-transition-dists-1))
 
 ;; Problem 2
 (defn compute-next-observation-marginal [curr-state next-obs transition-dists obs-dists]
   (logsumexp 
     (map 
       (fn [s] (score-next-state-word curr-state s next-obs transition-dists obs-dists)) 
-        hidden-states)))
+      hidden-states)))
 
 (println 'Problem 2)
 (println (compute-next-observation-marginal 'Start 'me theta-transition-dists-1 theta-observation-dists-1))
@@ -75,12 +78,46 @@
   (if (empty? next-k-states) 
     []
     (cons 
-      (Math/pow 2 (score-next-state-word curr-state (first next-k-states) (first next-k-obs) transition-dists obs-dists))
+      (score-next-state-word curr-state (first next-k-states) (first next-k-obs) transition-dists obs-dists)
       (score-next-states-words-recur curr-state (rest next-k-states) (rest next-k-obs) transition-dists obs-dists))))
 
 (defn score-next-states-words [curr-state next-k-states next-k-obs transition-dists obs-dists]
-  (logsumexp (score-next-states-words-recur curr-state next-k-states next-k-obs transition-dists obs-dists)))
+  (reduce + (score-next-states-words-recur curr-state next-k-states next-k-obs transition-dists obs-dists)))
 
 (println 'Problem 3)
-(println (score-next-states-words 'Start ['N 'N 'V] ['me 'Ishmael 'me] theta-transition-dists-1 theta-observation-dists-1))
+(println (score-next-states-words 'Start ['N 'N 'V] ['me 'Ishmael 'Call] theta-transition-dists-1 theta-observation-dists-1))
+
+; Problem 4
+(defn compute-next-words-marginal [curr-state next-k-obs transition-dists obs-dists]
+  (if (empty? next-k-obs) 
+    0.0
+    (logsumexp
+      (map 
+        (fn [next-state] 
+          (+ 
+            (score-next-state-word curr-state next-state (first next-k-obs) transition-dists obs-dists)
+            (compute-next-words-marginal next-state (rest next-k-obs) transition-dists obs-dists))) 
+        hidden-states))))
+
+; (defn compute-next-words-marginal-recur [curr-state next-k-obs transition-dists obs-dists]
+;   (if (empty? next-k-obs) 
+;     []
+;     (map 
+;       (fn [next-state]
+;       (logsumexp-clean
+;         (cons 
+;           (score-next-state-word curr-state next-state (first next-k-obs) transition-dists obs-dists)
+;           (compute-next-words-marginal-recur next-state (rest next-k-obs) transition-dists obs-dists)))
+;           )
+;     hidden-states)))
+
+; (defn compute-next-words-marginal [curr-state next-k-obs transition-dists obs-dists]
+;   (compute-next-words-marginal-recur curr-state next-k-obs transition-dists obs-dists))
+
+(println 'Problem 4)
+(println (compute-next-words-marginal 'Start ['me 'Ishmael 'me] 'theta-transition-dists-1 theta-observation-dists-1))
+
+(println 'Problem 5)
+(println (compute-next-words-marginal 'Start ['Call 'me] 'theta-transition-dists-1 theta-observation-dists-1))
+(println (compute-next-words-marginal 'Start ['me ] 'theta-transition-dists-1 theta-observation-dists-1))
 
